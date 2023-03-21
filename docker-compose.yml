@@ -1,0 +1,81 @@
+version: '3.7'
+services:
+
+  osticket-app:
+    image: tiredofit/osticket
+    container_name: osticket-app
+    volumes:
+      - ./data/:/www/osticket
+      - ./logs/:/www/logs
+    environment:
+      - TIMEZONE=Europa/Madrid
+      - CONTAINER_NAME=osticket-app
+
+      - CRON_PERIOD=10
+
+      - DB_HOST=osticket-db
+      - DB_NAME=osticket
+      - DB_USER=osticket
+      - DB_PASS=password
+
+      - SMTP_HOST=localhost
+      - SMTP_PORT=25
+      - SMTP_FROM=osticket@cyberdevops.es
+      - SMTP_TLS=0
+      - SMTP_USER=osticket@cyberdevops.es
+      - SMTP_PASS=password
+
+      - INSTALL_SECRET=somerandomlargecharacterstring
+      - INSTALL_EMAIL=osticket@cyberdevops.es
+      - INSTALL_NAME=OSTicket Helpdesk
+
+      - ADMIN_FIRSTNAME=Admin
+      - ADMIN_LASTNAME=User
+      - ADMIN_EMAIL=admin@cyberdevops.es
+      - ADMIN_USER=ostadmin
+      - ADMIN_PASS=password123
+    networks:
+      - osticket
+    restart: always
+    ports:
+      - 8080:80
+
+  osticket-db:
+    image: tiredofit/mariadb:10.11
+    container_name: osticket-db
+    volumes:
+      - ./db:/var/lib/mysql
+    environment:
+      - TIMEZONE=Europa/Madrid
+      - CONTAINER_NAME=osticket-db
+
+      - ROOT_PASS=securepassword
+      - DB_NAME=osticket
+      - DB_USER=osticket
+      - DB_PASS=password
+    networks:
+      - osticket
+    restart: always
+
+  osticket-db-backup:
+    container_name: osticket-db-backup
+    image: tiredofit/db-backup:latest
+    volumes:
+      - ./dbbackup:/backup
+    environment:
+      - TIMEZONE=Europa/Madrid
+      - CONTAINER_NAME=osticket-db-backup
+      - DB_HOST=osticket-db
+      - DB_TYPE=mariadb
+      - DB_NAME=osticket
+      - DB_USER=osticket
+      - DB_PASSWORD=userpassword
+      - DB_DUMP_FREQ=1440
+      - DB_DUMP_BEGIN=0000
+      - DB_CLEANUP_TIME=8640
+    networks:
+      - osticket
+    restart: always
+
+networks:
+  osticket:
