@@ -33,7 +33,7 @@ services:
       - ADMIN_LASTNAME=User
       - ADMIN_EMAIL=admin@cyberdevops.es
       - ADMIN_USER=ostadmin
-      - ADMIN_PASS=password123
+      - ADMIN_PASS=password
     networks:
       - osticket
     restart: always
